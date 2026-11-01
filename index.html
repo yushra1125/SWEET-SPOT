@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#211713"><link rel="manifest" href="manifest.webmanifest">
+<title>Sweet Spot | Bakery Hisab</title>
+<style>
+:root{--bg:#211713;--panel:#30211b;--panel2:#3b2921;--gold:#d9b47b;--cream:#f6ead8;--muted:#c4ad98;--line:#594237;--green:#a8c79b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--cream);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:22px 18px 16px;background:linear-gradient(135deg,#493126,#211713);border-bottom:1px solid var(--line)}
+.brand{color:var(--gold);font-size:12px;letter-spacing:3px;text-transform:uppercase}.title{font:32px Georgia,serif;margin:5px 0}.sub,.hint,.label{color:var(--muted)}
+nav{display:flex;gap:8px;overflow:auto;padding:12px;background:#291c17;position:sticky;top:0;z-index:2}
+button,.btn{border:1px solid var(--line);background:var(--panel2);color:var(--cream);padding:10px 13px;border-radius:11px;cursor:pointer;white-space:nowrap}
+nav button.active,.primary{background:var(--gold);color:#281a13;border-color:var(--gold);font-weight:700}
+main{max-width:1000px;margin:auto;padding:15px}.page{display:none}.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:12px}
+.label{font-size:12px}.amount{font-size:24px;font-weight:750;margin-top:5px;color:var(--gold)}
+h2{font:23px Georgia,serif;color:var(--gold);margin:8px 0 14px}h3{font-size:16px;margin:0 0 12px}
+form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.field{display:flex;flex-direction:column;gap:5px}.full{grid-column:1/-1}
+label{font-size:12px;color:var(--muted)}input,select{width:100%;background:#211713;color:var(--cream);border:1px solid var(--line);border-radius:10px;padding:11px;font:inherit;min-width:0}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.hint{font-size:12px;line-height:1.5}
+.scroll{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:9px 7px;border-bottom:1px solid var(--line)}th{color:var(--muted)}
+.empty{color:var(--muted);padding:12px 0}.pill{border:1px solid var(--line);border-radius:20px;padding:3px 8px;color:var(--gold);font-size:11px}
+@media(max-width:540px){main{padding:11px}.grid{grid-template-columns:1fr 1fr}.amount{font-size:20px}form{grid-template-columns:1fr}.full{grid-column:auto}}
+</style></head>
+<body>
+<header><div class="brand">Home Bakery • Management</div><div class="title">Sweet Spot</div><div class="sub">Your bakery, beautifully organised.</div></header>
+<nav>
+<button class="active" data-page="home">Home</button><button data-page="costing">Product Costing</button><button data-page="orders">Orders</button><button data-page="income">Income</button><button data-page="materials">Raw Materials</button><button data-page="expenses">Expenses</button><button data-page="profit">Profit</button><button data-page="recipes">Recipe Library</button><button data-page="backup">Backup</button>
+</nav>
+<main>
+<section id="home" class="page active"><h2>Dashboard</h2><div class="grid">
+<div class="card"><div class="label">Income Received</div><div class="amount" id="dIncome">₹0</div></div>
+<div class="card"><div class="label">Costing Fund Balance</div><div class="amount" id="dFund">₹0</div></div>
+<div class="card"><div class="label">Profit Balance</div><div class="amount" id="dProfit">₹24,290</div></div>
+<div class="card"><div class="label">Raw Material Purchases</div><div class="amount" id="dPurchases">₹0</div></div></div>
+<div class="card"><h3>Welcome to Sweet Spot</h3><p class="hint">Use the tabs above to manage product costing, customer orders, income, raw-material purchases and profit separately. Data is saved in this browser on this device.</p></div>
+<div class="card"><h3>Your Products</h3><div id="homeProducts" class="empty">Add products in Product Costing to see them here.</div></div></section>
+
+<section id="costing" class="page"><h2>Product Costing</h2>
+<div class="card"><h3>Save a product's per-unit costing</h3><p class="hint">Enter the final cost per piece after ingredients, packaging, electricity and other product costs. Orders will use this saved cost automatically.</p>
+<form id="productForm"><div class="field"><label>Product name</label><input id="pName" required placeholder="Chocolate Tub"></div><div class="field"><label>Cost per unit (₹)</label><input id="pCost" type="number" min="0" step=".01" required></div><div class="field"><label>Selling price per unit (₹)</label><input id="pPrice" type="number" min="0" step=".01"></div><div class="field"><label>Notes / size</label><input id="pNote" placeholder="75 g tub, 500 g cake..."></div></form>
+<div class="actions"><button class="primary" form="productForm">Save Product</button></div></div>
+<div class="card"><h3>Saved products</h3><div id="productList" class="scroll"></div></div></section>
+
+<section id="orders" class="page"><h2>Customer Orders</h2><div class="card"><form id="orderForm">
+<div class="field"><label>Customer name</label><input id="oCustomer" required></div><div class="field"><label>Order date</label><input id="oDate" type="date" required></div>
+<div class="field"><label>Product</label><select id="oProduct" required><option value="">Select saved product</option></select></div><div class="field"><label>Quantity</label><input id="oQty" type="number" min="1" step="1" required></div>
+<div class="field"><label>Selling price per unit (₹)</label><input id="oPrice" type="number" min="0" step=".01" required></div><div class="field"><label>Amount received (₹)</label><input id="oReceived" type="number" min="0" step=".01" required></div>
+<div class="field"><label>Delivery date</label><input id="oDelivery" type="date"></div><div class="field full"><div id="oPreview" class="hint">Choose a product and quantity to preview the calculation.</div></div></form><div class="actions"><button class="primary" form="orderForm">Save Order</button></div></div>
+<div class="card"><h3>Order history</h3><div id="orderList" class="scroll"></div></div></section>
+
+<section id="income" class="page"><h2>Income</h2><div class="card"><div class="label">Total amount received from orders</div><div class="amount" id="incomeTotal">₹0</div><p class="hint">Income is recorded from the Amount Received field in each order. No separate pending-payment section is included.</p></div><div class="card"><h3>Income history</h3><div id="incomeList" class="scroll"></div></div></section>
+
+<section id="materials" class="page"><h2>Raw Materials</h2><div class="card"><h3>Record a raw-material purchase</h3><p class="hint">Purchase amount is deducted only from Costing Fund. Profit balance does not change.</p><form id="materialForm">
+<div class="field"><label>Date</label><input id="mDate" type="date" required></div><div class="field"><label>Item name</label><input id="mItem" required placeholder="Butter, maida..."></div>
+<div class="field"><label>Quantity</label><input id="mQty" placeholder="500 g, 1 kg..."></div><div class="field"><label>Amount paid (₹)</label><input id="mAmount" type="number" min=".01" step=".01" required></div></form><div class="actions"><button class="primary" form="materialForm">Save Purchase</button></div></div><div class="card"><h3>Purchase history</h3><div id="materialList" class="scroll"></div></div></section>
+
+<section id="expenses" class="page"><h2>Personal Expenses</h2><div class="card"><p class="hint">Record your personal spending here. Each saved expense is automatically deducted from your Profit Balance. Raw-material purchases are recorded separately in Raw Materials.</p><form id="expenseForm"><div class="field"><label>Expense date</label><input id="eDate" type="date" required></div><div class="field"><label>Expense name</label><input id="eName" required placeholder="Personal shopping, travel..."></div><div class="field"><label>Amount (₹)</label><input id="eAmount" type="number" min=".01" step=".01" required></div></form><div class="actions"><button class="primary" form="expenseForm">Save Personal Expense</button></div></div><div class="card"><h3>Personal expense history</h3><div id="expenseList" class="scroll"></div></div></section>
+
+<section id="profit" class="page"><h2>Profit Balance</h2><div class="card"><h3>Edit your starting profit</h3><p class="hint">₹24,290 is only a starting estimate. Change it to the exact amount you currently have. This is your opening balance before new order profits and personal expenses.</p><form id="profitOpeningForm"><div class="field"><label>Opening profit balance (₹)</label><input id="pOpeningProfit" type="number" min="0" step=".01" required></div></form><div class="actions"><button class="primary" form="profitOpeningForm">Save Opening Balance</button></div></div><div class="card"><div class="label">Current profit balance</div><div class="amount" id="profitTotal">₹24,290</div><div class="hint" id="profitBreakdown"></div></div></section>
+
+<section id="recipes" class="page"><h2>Recipe Library</h2><div class="card"><p class="hint">Add recipe PDF files here. Files stay in this browser on this device; include important recipe files in your own backup folder too.</p><div class="field"><label>Choose recipe PDF</label><input id="recipeFile" type="file" accept="application/pdf"></div><div class="field" style="margin-top:10px"><label>Recipe name / category</label><input id="recipeName" placeholder="Chocolate tub / Cakes"></div><div class="actions"><button class="primary" id="addRecipe">Add PDF</button></div></div><div class="card"><h3>Saved recipes</h3><div id="recipeList" class="empty">No recipes added.</div></div></section>
+
+<section id="backup" class="page"><h2>Backup & Starting Balance</h2><div class="card"><h3>Opening costing fund</h3><p class="hint">Enter the amount you already have set aside for raw-material purchases. Your opening profit balance can be edited in the Profit tab.</p><form id="balanceForm"><div class="field"><label>Opening costing fund (₹)</label><input id="bFund" type="number" min="0" step=".01"></div></form><div class="actions"><button class="primary" form="balanceForm">Save balances</button></div></div>
+<div class="card"><h3>Backup & restore</h3><div class="actions"><button id="exportBtn">Export backup file</button><label class="btn" for="importFile">Restore backup</label><input id="importFile" type="file" accept="application/json" style="display:none"></div><p class="hint">This app stores data locally in this browser. It does not automatically sync between phone and laptop. Export a backup to transfer your records.</p></div></section>
+</main>
+<script>
+const KEY='sweetSpotApp_v1',today=new Date().toISOString().slice(0,10);
+let db;try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!db)db={openingProfit:24290,openingFund:0,products:[],orders:[],materials:[],expenses:[],recipes:[]};
+const $=id=>document.getElementById(id),fmt=n=>'₹'+(Number(n)||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function persist(){localStorage.setItem(KEY,JSON.stringify(db));render()}
+function calc(){let income=db.orders.reduce((a,x)=>a+x.received,0),cost=db.orders.reduce((a,x)=>a+x.costAllocated,0),profit=db.orders.reduce((a,x)=>a+x.profitAllocated,0),spent=db.materials.reduce((a,x)=>a+x.amount,0),personalSpent=db.expenses.reduce((a,x)=>a+(Number(x.amount)||0),0);return{income,spent,personalSpent,fund:db.openingFund+cost-spent,profit:db.openingProfit+profit-personalSpent,addedProfit:profit}}
+function table(rows,heads){if(!rows.length)return '<div class="empty">Nothing recorded yet.</div>';return '<table><tr>'+heads.map(h=>'<th>'+h+'</th>').join('')+'</tr>'+rows.join('')+'</table>'}
+function render(){let t=calc();$('dIncome').textContent=fmt(t.income);$('dFund').textContent=fmt(t.fund);$('dProfit').textContent=fmt(t.profit);$('dPurchases').textContent=fmt(t.spent);$('incomeTotal').textContent=fmt(t.income);$('profitTotal').textContent=fmt(t.profit);$('profitBreakdown').textContent=`Opening profit ${fmt(db.openingProfit)} + profit from received orders ${fmt(t.addedProfit)} − personal expenses ${fmt(t.personalSpent)}.`;
+$('pOpeningProfit').value=db.openingProfit;$('bFund').value=db.openingFund;
+$('oProduct').innerHTML='<option value="">Select saved product</option>'+db.products.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+$('productList').innerHTML=table(db.products.map(p=>`<tr><td>${esc(p.name)}<br><span class="hint">${esc(p.note||'')}</span></td><td>${fmt(p.cost)}</td><td>${fmt(p.price||0)}</td><td><button onclick="editProduct('${p.id}')">Edit</button></td></tr>`),['Product','Cost/unit','Selling/unit','']);
+$('homeProducts').innerHTML=db.products.length?db.products.map(p=>`<span class="pill">${esc(p.name)}</span> `).join(''):'Add products in Product Costing to see them here.';
+$('orderList').innerHTML=table([...db.orders].reverse().map(o=>`<tr><td>${esc(o.date)}</td><td>${esc(o.customer)}</td><td>${esc(o.product)}</td><td>${o.qty}</td><td>${fmt(o.received)}</td><td>${fmt(o.costAllocated)}</td><td>${fmt(o.profitAllocated)}</td></tr>`),['Date','Customer','Product','Qty','Received','Cost fund','Profit']);
+$('incomeList').innerHTML=table([...db.orders].filter(o=>o.received>0).reverse().map(o=>`<tr><td>${esc(o.date)}</td><td>${esc(o.customer)}</td><td>${esc(o.product)}</td><td>${fmt(o.received)}</td></tr>`),['Date','Customer','Product','Received']);
+$('materialList').innerHTML=table([...db.materials].reverse().map(m=>`<tr><td>${esc(m.date)}</td><td>${esc(m.item)}</td><td>${esc(m.qty)}</td><td>${fmt(m.amount)}</td></tr>`),['Date','Item','Quantity','Amount']);
+$('expenseList').innerHTML=table([...db.expenses].reverse().map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.name)}</td><td>${fmt(x.amount)}</td></tr>`),['Date','Expense name','Amount']);
+$('recipeList').innerHTML=db.recipes.length?db.recipes.map(r=>`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><span>${esc(r.name)} <span class="pill">PDF</span></span><button onclick="downloadRecipe('${r.id}')">Open / Save</button></div>`).join(''):'No recipes added.';
+preview();}
+function preview(){let p=db.products.find(x=>x.id===$('oProduct').value),q=+$('oQty').value||0,price=+$('oPrice').value||0,received=+$('oReceived').value||0;if(!p){$('oPreview').textContent='Choose a saved product to preview automatic costing.';return}let sale=q*price,cost=q*p.cost,ratio=sale?Math.min(1,received/sale):0;$('oPreview').textContent=`Saved cost ${fmt(p.cost)} per unit • Order total ${fmt(sale)} • Full costing ${fmt(cost)}. On amount received now: ${fmt(cost*ratio)} goes to Costing Fund and ${fmt(Math.max(0,received-cost*ratio))} goes to Profit.`}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));b.classList.add('active');$(b.dataset.page).classList.add('active')});
+['oProduct','oQty','oPrice','oReceived'].forEach(id=>$(id).addEventListener('input',preview));
+['oDate','mDate','eDate'].forEach(id=>$(id).value=today);
+$('productForm').onsubmit=e=>{e.preventDefault();let name=$('pName').value.trim(),old=db.products.find(p=>p.name.toLowerCase()===name.toLowerCase()),vals={name,cost:+$('pCost').value,price:+$('pPrice').value||0,note:$('pNote').value};if(old)Object.assign(old,vals);else db.products.push({id:crypto.randomUUID(),...vals});e.target.reset();persist()};
+window.editProduct=id=>{let p=db.products.find(x=>x.id===id);$('pName').value=p.name;$('pCost').value=p.cost;$('pPrice').value=p.price;$('pNote').value=p.note;document.querySelector('[data-page="costing"]').click()};
+$('orderForm').onsubmit=e=>{e.preventDefault();let p=db.products.find(x=>x.id===$('oProduct').value);if(!p){alert('Please save a product costing first.');return}let qty=+$('oQty').value,price=+$('oPrice').value,received=+$('oReceived').value,sale=qty*price;if(received>sale){alert('Amount received cannot exceed total order value.');return}let cost=qty*p.cost,ratio=sale?received/sale:0;db.orders.push({date:$('oDate').value,delivery:$('oDelivery').value,customer:$('oCustomer').value.trim(),product:p.name,qty,price,received,sale,costPerUnit:p.cost,costTotal:cost,costAllocated:cost*ratio,profitAllocated:Math.max(0,received-cost*ratio)});e.target.reset();$('oDate').value=today;persist();alert('Order saved. Received amount divided into Costing Fund and Profit.')};
+$('materialForm').onsubmit=e=>{e.preventDefault();let amount=+$('mAmount').value;if(amount>calc().fund&&!confirm('This is more than your current Costing Fund. Save anyway?'))return;db.materials.push({date:$('mDate').value,item:$('mItem').value.trim(),qty:$('mQty').value,amount});e.target.reset();$('mDate').value=today;persist()};
+$('expenseForm').onsubmit=e=>{e.preventDefault();db.expenses.push({date:$('eDate').value,name:$('eName').value.trim(),amount:+$('eAmount').value});e.target.reset();$('eDate').value=today;persist()};
+$('balanceForm').onsubmit=e=>{e.preventDefault();db.openingFund=+$('bFund').value;persist();alert('Opening costing fund saved.')};
+$('profitOpeningForm').onsubmit=e=>{e.preventDefault();db.openingProfit=+$('pOpeningProfit').value;persist();alert('Opening profit balance updated.')};
+$('exportBtn').onclick=()=>{let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sweet-spot-backup.json';a.click();URL.revokeObjectURL(a.href)};
+$('importFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let x=JSON.parse(await f.text());if(!Array.isArray(x.products)||!Array.isArray(x.orders)||!Array.isArray(x.materials))throw 0;if(confirm('Restore backup? This replaces the data currently saved in this browser.')){db=x;persist();alert('Backup restored.')}}catch(_){alert('Invalid backup file.')}e.target.value=''};
+$('addRecipe').onclick=async()=>{let f=$('recipeFile').files[0],name=$('recipeName').value.trim();if(!f||!name){alert('Choose a PDF and enter its name/category.');return}if(f.size>3*1024*1024){alert('For this first version, please use PDF files under 3 MB.');return}let reader=new FileReader();reader.onload=()=>{db.recipes.push({id:crypto.randomUUID(),name,data:reader.result});persist();$('recipeFile').value='';$('recipeName').value=''};reader.readAsDataURL(f)};
+window.downloadRecipe=id=>{let r=db.recipes.find(x=>x.id===id),a=document.createElement('a');a.href=r.data;a.download=r.name.replace(/[^a-z0-9-_]/gi,'_')+'.pdf';a.click()};
+render();
+</script><script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}</script>
+</body></html>
